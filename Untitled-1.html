@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi sitio Pokémon</title>
+    <style>
+        body {
+            font: cursive;
+            color: black;
+            background: rgb(2,0,36);
+            background: linear-gradient(90deg, rgb(46, 43, 112) 0%, rgb(78, 60, 158) 0%, rgba(195,128,183,1) 50%, rgba(0,212,255,1) 100%);
+            background-color: aqua;
+        }
+        h1 {
+            color: rgb(205, 16, 183);
+        }
+        .pokemon {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: aliceblue;
+            border-radius: 100px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0, 1);
+        }
+        .pokemon img {
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mi proyecto del 7 de noviembre</h1>
+    <hr>
+    <h3>Estos son los Pokémon</h3>
+    <div id="pokemon-container"></div>
+
+    <script>
+        async function obtenerPokemones() {
+            try {
+                // Hacemos la solicitud a la API de Pokémon
+                const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10');
+                const data = await response.json();
+                const pokemonContainer = document.getElementById('pokemon-container');
+
+                // Por cada Pokémon recibido en la respuesta, obtenemos su información
+                for (const pokemon of data.results) {
+                    // Realizamos otra solicitud para obtener más detalles de cada Pokémon
+                    const pokemonDetailsResponse = await fetch(pokemon.url);
+                    const pokemonDetails = await pokemonDetailsResponse.json();
+
+                    // Creamos un elemento para mostrar el Pokémon
+                    const pokemonElement = document.createElement('div');
+                    pokemonElement.classList.add('pokemon');
+                    pokemonElement.innerHTML = `
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonDetails.id}.png" alt="${pokemonDetails.name}" width="100">
+                        <div>
+                            <h3>Nombre: ${pokemonDetails.name}</h3>
+                            <hr>
+                            <p>ID: ${pokemonDetails.id}</p>
+                            <p>Altura: ${pokemonDetails.height / 10} m</p>
+                            <p>Peso: ${pokemonDetails.weight / 10} kg</p>
+                            <p>Tipos: ${pokemonDetails.types.map(type => type.type.name).join(', ')}</p>
+                        </div>
+                    `;
+                    pokemonContainer.appendChild(pokemonElement);
+                }
+            } catch (error) {
+                console.error('Error al intentar obtener los Pokémon', error);
+            }
+        }
+
+        // Llamamos a la función cuando la página se carga
+        window.onload = obtenerPokemones;
+    </script>
+</body>
+</html>
